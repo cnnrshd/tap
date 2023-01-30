@@ -14,6 +14,13 @@ TAP is a remote penetration testing platform builder. For folks in the security 
 It also has a number of other options, for example, in the event you lose SSH, it'll connect out to a text file and execute commands for you. Also updates itself continiously as well as ensure that you are running the latest packages for Ubuntu Linux (if that is your OS).
 
 ## TAP Installation
+
+Install `requirements.txt`. Instructions vary between venv manager. Pip instructions are:
+
+```sh
+pip3 install -r requirements.txt
+```
+
 ```
 python setup.py - This will install TAP.
 ```

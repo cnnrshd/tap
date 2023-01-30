@@ -15,13 +15,14 @@ import re
 import stat
 try:
     import pexpect
-except ImportError:
-    subprocess.Popen("apt-get -y install python3-pexpect", shell=True).wait()
-    try:
-        import pexpect
-    except ImportError:
-        print("Install python3-pexpect first, then re-run setup.")
-        sys.exit(1)
+except ImportError as e:
+    print("Error importing pexpect. Install pexpect from requirements.txt then rerun setup.")
+    raise(e)
+try:
+    from Cryptodome.Cipher import AES
+except ImportError as e:
+    print(f"Error importing AES. Install cryptodome from requirements.txt then rerun setup.")
+    raise(e)
 
 print("[*] Installing some base packages...")
 subprocess.Popen("apt-get -y install htop dbus-x11", shell=True).wait()

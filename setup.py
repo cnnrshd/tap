@@ -147,10 +147,14 @@ if answer.lower() == "y" or answer.lower() == "yes":
         set_background()
                 
         # install git and update everything
-        print("[*] Updating everything beforehand...")
-        subprocess.Popen("apt-get update && apt-get --force-yes -y upgrade && apt-get --force-yes -y dist-upgrade", shell=True).wait()
-        subprocess.Popen("apt-get --force-yes -y install git python3-pycryptodome python3-pexpect openssh-server net-tools", shell=True).wait()
-        from Crypto.Cipher import AES
+        install_updates = True
+        update_check = input("Would you like to verify installed programs and update everything before progressing? [y/n]: ")
+        if update_check[0].lower() == 'n':
+            install_updates = False
+        if install_updates:
+            print("[*] Updating everything beforehand...")
+            subprocess.Popen("apt-get update && apt-get --force-yes -y upgrade && apt-get --force-yes -y dist-upgrade", shell=True).wait()
+            subprocess.Popen("apt-get --force-yes -y install git python3-pycryptodome python3-pexpect openssh-server net-tools", shell=True).wait()
         choice = input("Do you want to keep TAP updated? (requires internet) [y/n]: ")
         if choice == "y" or choice == "yes":
             print("[*] Checking out latest TAP to /usr/share/tap")

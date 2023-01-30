@@ -12,14 +12,10 @@ import time
 import os
 import pexpect
 try:
-    from Crypto.Cipher import AES
-except ImportError:
-    subprocess.Popen("apt-get -y install python3-pycryptodome", shell=True).wait()
-    try:
-        from Crypto.Cipher import AES
-    except ImportError:
-        print("Install python3-pycryptodome first, then re-run setup.")
-        sys.exit(1)
+    from Cryptodome.Cipher import AES
+except ImportError as e:
+    print(f"Error importing AES. Install cryptodome from requirements.txt then rerun setup.")
+    raise(e)
 
 import base64
 import urllib.request, urllib.error, urllib.parse

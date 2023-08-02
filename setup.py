@@ -4,15 +4,17 @@
 # quick script for installing tap
 #
 ##
-import subprocess,re,os,shutil,sys
 import base64
-from src.core.tapcore import ssh_keygen
-from src.core.tapcore import motd
-from src.core.tapcore import set_background
 import getpass
-import sys
+import os
 import re
+import shutil
 import stat
+import subprocess
+import sys
+
+from src.core.tapcore import motd, set_background, ssh_keygen
+
 try:
     import pexpect
 except ImportError as e:
@@ -154,7 +156,7 @@ if answer.lower() == "y" or answer.lower() == "yes":
         if install_updates:
             print("[*] Updating everything beforehand...")
             subprocess.Popen("apt-get update && apt-get --force-yes -y upgrade && apt-get --force-yes -y dist-upgrade", shell=True).wait()
-            subprocess.Popen("apt-get --force-yes -y install git python3-pycryptodome python3-pexpect openssh-server net-tools", shell=True).wait()
+            subprocess.Popen("apt-get --force-yes -y install git openssh-server net-tools", shell=True).wait()
         choice = input("Do you want to keep TAP updated? (requires internet) [y/n]: ")
         if choice == "y" or choice == "yes":
             print("[*] Checking out latest TAP to /usr/share/tap")

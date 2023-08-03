@@ -247,10 +247,10 @@ def parse_args() -> Config:
     install_group = service_group.add_mutually_exclusive_group()
     install_group.add_argument("-i", "--install", action="store_true", help="Install TAP", default=None)
     install_group.add_argument("-u", "--uninstall", action="store_true", help="Uninstall TAP", default=None)
-    service_group.add_argument("--update-programs", action="store_true", help="Update all required programs", default=None)
-    service_group.add_argument("--update-tap", action="store_true", help="Update TAP", default=None)
-    service_group.add_argument("--install-programs", action="store_true", help="Install all required programs", default=None)
-    service_group.add_argument("--start-tap", action="store_true", help="Start TAP", default=None)
+    service_group.add_argument("--update-programs", type=bool, help="Update all required programs", default=None)
+    service_group.add_argument("--update-tap", type=bool, help="Update TAP", default=None)
+    service_group.add_argument("--install-programs", type=bool, help="Install all required programs", default=None)
+    service_group.add_argument("--start-tap", type=bool, help="Start TAP", default=None)
 
     auth_group = parser.add_argument_group("Authentication", description="Authentication options")
     auth_type_group = auth_group.add_mutually_exclusive_group()
@@ -269,10 +269,10 @@ def parse_args() -> Config:
     ssh_group.add_argument("--remote-port", help="Remote port for SSH connection", default=None)
 
     misc_group = parser.add_argument_group("Misc", description="Misc options")
-    misc_group.add_argument("--auto-update", action="store_true", help="Automatically update TAP", default=None)
-    misc_group.add_argument("--background", action="store_true", help="Set background", default=None)
+    misc_group.add_argument("--auto-update", type=bool, help="Automatically update TAP", default=None)
+    misc_group.add_argument("--background", type=bool, help="Set background", default=None)
     misc_group.add_argument("--git-url", help="URL to git repo to clone", default="https://github.com/trustedsec/tap.git")
-    misc_group.add_argument("--log-everything", action="store_true", help="TAP has the ability to log every command "
+    misc_group.add_argument("--log-everything", type=bool, help="TAP has the ability to log every command "
         "used via SSH. This is useful for clients who want log files of the pentest. All logs are saved in /var/log/messages"
         , default=None)
 

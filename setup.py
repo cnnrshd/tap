@@ -314,6 +314,7 @@ def install_tap(config: Config):
         custom_shell("cp -rf * /usr/share/tap/", dry_run=config.dry_run)
     # logging everything is handled in the top level - don't need to here
     # Connect to the remote SSH server and setup the reverse SSH connection
+    password = "" # has to be defined here
     if config.use_ssh_keys:
         # ensure SSH agent is started
         print("[*] Starting SSH agent...")
@@ -389,6 +390,23 @@ def install_tap(config: Config):
             # actual ssh key
             child.sendline("echo '%s' >> ~/.ssh/authorized_keys" % (pub))
             print("[*] Key for %s added to the external box: %s" % (hostname, config.remote_host))
+            print("[*] Ensuring config is setup correctly...")
+            # add to ssh config
+            # check if there's a reference to the hostname already
+            fileread = open("/root/.ssh/config", "r")
+            data = fileread.read()
+            fileread.close()
+            if not hostname in data:
+                filewrite = open("/root/.ssh/config", "a")
+                filewrite.write("Host %s\n" % (hostname))
+                filewrite.write("    Hostname %s\n" % (config.remote_host))
+                filewrite.write("    Port %s\n" % (config.remote_port))
+                filewrite.write("    User %s\n" % (config.username))
+                filewrite.write("    IdentityFile %s\n" % (str(config.ssh_key.absolute().resolve())))
+                filewrite.close()
+                print("[*] Added SSH config for %s" % (hostname))
+            else:
+                print("[*] SSH config already exists for %s" % (hostname))
         # Check if ssh keys already installed
     else: # This is password auth
         # Encrypt the password

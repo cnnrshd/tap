@@ -135,8 +135,8 @@ class Config:
     use_password: bool = None
     password: str = None
     username: str = None
-    existing_key: bool = None
-    ssh_key: Path = None
+    # existing_key: bool = None
+    # ssh_key: Path = None
     keys_on_remote: bool = None
     new_key_name: str = None
 
@@ -182,30 +182,30 @@ class Config:
         prompt_user(self, "log_everything", "Do you want to log everything: [y/n]: ", {"y": True, "n": False})
         prompt_user(self, "keys_on_remote", "Are the SSH keys on the remote server: [y/n]: ", {"y": True, "n": False})
         prompt_user(self, "start_tap", "Do you want to start TAP on successful installation: [y/n]: ", {"y": True, "n": False})
-        if self.use_ssh_keys:
-            # Determine if they want to create new keys or use old keys
-            prompt_user(self, "existing_key", "Do you want to use existing SSH keys: [y/n]: ", {"y": True, "n": False})
-            if self.existing_key and not self.ssh_key:
-                while True:
-                    ssh_key = input("Enter path to SSH public key: ")
-                    if os.path.isfile(ssh_key):
-                        self.ssh_key = Path(ssh_key)
-                        break
-                    else:
-                        print("Invalid path. Please try again.")
-            else: # Writing a new key
-                while True and not self.ssh_key:
-                    new_key_path = input("Enter path for new SSH keypair (don't include .pub): ") # Should be full path to file
-                    # check if path is valid
-                    if os.path.isfile(new_key_path):
-                        print("File already exists. Please try again.")
-                        continue
-                    # check if path is valid
-                    if os.path.isdir(os.path.dirname(new_key_path)):
-                        self.ssh_key = Path(new_key_path)
-                        break
-                    else:
-                        print("Invalid name. Please try again.")
+        # if self.use_ssh_keys:
+        #     # Determine if they want to create new keys or use old keys
+        #     prompt_user(self, "existing_key", "Do you want to use existing SSH keys: [y/n]: ", {"y": True, "n": False})
+        #     if self.existing_key and not self.ssh_key:
+        #         while True:
+        #             ssh_key = input("Enter path to SSH public key: ")
+        #             if os.path.isfile(ssh_key):
+        #                 self.ssh_key = Path(ssh_key)
+        #                 break
+        #             else:
+        #                 print("Invalid path. Please try again.")
+        #     else: # Writing a new key
+        #         while True and not self.ssh_key:
+        #             new_key_path = input("Enter path for new SSH keypair (don't include .pub): ") # Should be full path to file
+        #             # check if path is valid
+        #             if os.path.isfile(new_key_path):
+        #                 print("File already exists. Please try again.")
+        #                 continue
+        #             # check if path is valid
+        #             if os.path.isdir(os.path.dirname(new_key_path)):
+        #                 self.ssh_key = Path(new_key_path)
+        #                 break
+        #             else:
+        #                 print("Invalid name. Please try again.")
         # Create new keys later
         if not self.use_ssh_keys:
             prompt_user(self, "use_password", "Do you want to use a password for authentication (only option - declined SSH keys): [y/n]: ", {"y": True})
@@ -261,11 +261,11 @@ def parse_args() -> Config:
     auth_type_group.add_argument("--use-password", action="store_true", help="Use password for authentication", default=None)
     auth_group.add_argument("--password", help="Password for SSH connection, can also read from the environment variable TAP_PASSWORD", default=os.environ.get("TAP_PASSWORD", None))
     auth_group.add_argument("--username", help="Username for SSH connection", default=None)
-    auth_group.add_argument("--ssh-key", help="SSH public key for SSH connection", default=None, type=Path)
+    # auth_group.add_argument("--ssh-key", help="SSH public key for SSH connection", default=None, type=Path)
     auth_group.add_argument("--keys-on-remote", help="If the public key exists on the remote server", default=None, type=bool)
     auth_group.add_argument("--no-keys-on-remote", help="If the public key exists on the remote server", dest="keys_on_remote", action="store_false")
-    auth_group.add_argument("--existing-key", type=bool, help="Use existing SSH key", default=None)
-    auth_group.add_argument("--no-existing-key", dest="existing_key", help="Do not use existing SSH key", action="store_false")
+    # auth_group.add_argument("--existing-key", type=bool, help="Use existing SSH key", default=None)
+    # auth_group.add_argument("--no-existing-key", dest="existing_key", help="Do not use existing SSH key", action="store_false")
 
     ssh_group = parser.add_argument_group("SSH", description="SSH options")
     ssh_group.add_argument("--local-port", help="Local port for SSH connection on the REMOTE MACHINE", default=None)
@@ -323,8 +323,11 @@ def install_tap(config: Config):
         if not config.existing_key:
             # make a key
             print("[*] Generating a new SSH keypair...")
-            custom_shell(f"ssh-keygen -q -N '' -C 'TAP Keypair' -t rsa -b 4096 -f {str(config.ssh_key.absolute().resolve())}", dry_run=config.dry_run)
-            custom_shell("ssh-add %s" % (str(config.ssh_key.absolute().resolve())), dry_run=config.dry_run)
+            custom_shell(f"ssh-keygen -q -N '' -C 'TAP Keypair' -t rsa -b 4096 -f /root/.ssh/id_rsa", dry_run=config.dry_run)
+            # SSH-add won't work, the agent only works for the current shell
+            # Do need to fix permissions tho
+
+            # custom_shell("ssh-add %s" % (str(config.ssh_key.absolute().resolve())), dry_run=config.dry_run)
         # At this point, a key is guaranteed to exist
         if config.keys_on_remote:
             child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
@@ -398,7 +401,7 @@ def install_tap(config: Config):
             fileread = open("/root/.ssh/config", "r")
             data = fileread.read()
             fileread.close()
-            if not hostname in data:
+            if not config.remote_host in data:
                 filewrite = open("/root/.ssh/config", "a")
                 filewrite.write("Host %s\n" % (config.remote_host))
                 filewrite.write("    Hostname %s\n" % (config.remote_host))
@@ -406,9 +409,17 @@ def install_tap(config: Config):
                 filewrite.write("    User %s\n" % (config.username))
                 filewrite.write("    IdentityFile %s\n" % (str(config.ssh_key.absolute().resolve())))
                 filewrite.close()
-                print("[*] Added SSH config for %s" % (hostname))
+                print("[*] Added SSH config for %s" % (config.remote_host))
             else:
-                print("[*] SSH config already exists for %s" % (hostname))
+                print("[*] SSH config already exists for %s" % (config.remote_host))
+            # Need to ensure that the fingerprint is added to the local known hosts
+            print("[*] Ensuring remote host is added to known hosts...")
+            with open("/root/.ssh/known_hosts", "r") as f:
+                data = f.read()
+                if not config.remote_host in data:
+                    print("[*] Adding remote host to known hosts...")
+                    custom_shell("ssh-keyscan -p %s %s >> /root/.ssh/known_hosts" % (config.remote_port, config.remote_host), dry_run=config.dry_run)
+            print("[*] Remote host has been added to known_hosts")
         # Check if ssh keys already installed
     else: # This is password auth
         # Encrypt the password

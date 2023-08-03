@@ -339,7 +339,7 @@ def install_tap(config: Config):
 
             # pull public key into memory
 
-            fileopen = open(f"{str(config.ssh_key)}.pub", "r")
+            fileopen = open("/root/.ssh/id_rsa.pub", "r")
             pub = fileopen.read()
             # spawn pexpect to add key
             child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
@@ -400,7 +400,7 @@ def install_tap(config: Config):
                 filewrite.write("    Hostname %s\n" % (config.remote_host))
                 filewrite.write("    Port %s\n" % (config.remote_port))
                 filewrite.write("    User %s\n" % (config.username))
-                filewrite.write("    IdentityFile %s\n" % (str(config.ssh_key.absolute().resolve())))
+                filewrite.write("    IdentityFile /root/.ssh/id_rsa\n")
                 filewrite.close()
                 print("[*] Added SSH config for %s" % (config.remote_host))
             else:

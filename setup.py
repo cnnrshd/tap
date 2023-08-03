@@ -400,7 +400,7 @@ def install_tap(config: Config):
             fileread.close()
             if not hostname in data:
                 filewrite = open("/root/.ssh/config", "a")
-                filewrite.write("Host %s\n" % (hostname))
+                filewrite.write("Host %s\n" % (config.remote_host))
                 filewrite.write("    Hostname %s\n" % (config.remote_host))
                 filewrite.write("    Port %s\n" % (config.remote_port))
                 filewrite.write("    User %s\n" % (config.username))

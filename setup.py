@@ -297,6 +297,7 @@ def install_tap(config: Config):
     # Get tap files to /usr/share/tap
     # first, clean the directory
     custom_shell("rm -rf /usr/share/tap", dry_run=config.dry_run)
+    custom_shell("mkdir /usr/share/tap", dry_run=config.dry_run)
     if config.auto_update:
         print("[*] Checking out latest TAP to /usr/share/tap")
         custom_shell(f"git clone {config.git_url} /usr/share/tap/", dry_run=config.dry_run)
@@ -311,7 +312,7 @@ def install_tap(config: Config):
         if not config.existing_key:
             # make a key
             print("[*] Generating a new SSH keypair...")
-            custom_shell(f"ssh-keygen -q -c 'TAP Keypair' -t rsa -b 4096 -f {str(config.ssh_key.absolute().resolve())}", dry_run=config.dry_run)
+            custom_shell(f"ssh-keygen -q -N '' -C 'TAP Keypair' -t rsa -b 4096 -f {str(config.ssh_key.absolute().resolve())}", dry_run=config.dry_run)
             custom_shell("ssh-add %s" % (str(config.ssh_key.absolute().resolve())), dry_run=config.dry_run)
         # At this point, a key is guaranteed to exist
         if config.keys_on_remote:

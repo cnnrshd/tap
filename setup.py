@@ -261,7 +261,7 @@ def parse_args() -> Config:
     auth_group.add_argument("--ssh-key", help="SSH public key for SSH connection", default=None, type=Path)
     auth_group.add_argument("--keys-on-remote", help="If the public key exists on the remote server", default=None, type=bool)
     auth_group.add_argument("--existing-key", type=bool, help="Use existing SSH key", default=None)
-    auth_group.add_argument("--no-existing-key", type=bool, dest="existing_key", help="Do not use existing SSH key", action="store_false")
+    auth_group.add_argument("--no-existing-key", dest="existing_key", help="Do not use existing SSH key", action="store_false")
 
     ssh_group = parser.add_argument_group("SSH", description="SSH options")
     ssh_group.add_argument("--local-port", help="Local port for SSH connection on the REMOTE MACHINE", default=None)

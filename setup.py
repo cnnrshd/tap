@@ -392,6 +392,8 @@ def install_tap(config: Config):
             print("[*] Key for %s added to the external box: %s" % (hostname, config.remote_host))
             print("[*] Ensuring config is setup correctly...")
             # add to ssh config
+            if not os.path.isfile("/root/.ssh/config"):
+                custom_shell("touch /root/.ssh/config", dry_run=config.dry_run)
             # check if there's a reference to the hostname already
             fileread = open("/root/.ssh/config", "r")
             data = fileread.read()

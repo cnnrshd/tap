@@ -473,8 +473,13 @@ def main():
     config = parse_args()
     print(config)
     # run through a wizard to modify the config
-    config.wizard()
-    print(config)
+    if not config.uninstall:
+        config.wizard()
+        print(config)
+    # uninstall
+    else:
+        print("[*] Uninstalling TAP...")
+        uninstall_tap(config)
     if config.update_programs:
         print("[*] Updating all programs...")
         custom_shell("apt-get update && apt-get --force-yes -y upgrade && apt-get --force-yes -y dist-upgrade", dry_run=config.dry_run)
@@ -489,9 +494,6 @@ def main():
         print("[*] Installing TAP...")
         kill_tap(dry_run=config.dry_run)
         install_tap(config)
-    elif config.uninstall:
-        print("[*] Uninstalling TAP...")
-        uninstall_tap(config)
     
 if __name__ == "__main__":
     main()

@@ -248,8 +248,11 @@ def parse_args() -> Config:
     install_group.add_argument("-i", "--install", action="store_true", help="Install TAP", default=None)
     install_group.add_argument("-u", "--uninstall", action="store_true", help="Uninstall TAP", default=None)
     service_group.add_argument("--update-programs", type=bool, help="Update all required programs", default=None)
+    service_group.add_argument("--no-update-programs", dest="update_programs", help="Do not update all required programs", action="store_false")
     service_group.add_argument("--update-tap", type=bool, help="Update TAP", default=None)
+    service_group.add_argument("--no-update-tap", dest="update_tap", help="Do not update TAP", action="store_false")
     service_group.add_argument("--install-programs", type=bool, help="Install all required programs", default=None)
+    service_group.add_argument("--no-install-programs", dest="install_programs", help="Do not install all required programs", action="store_false")
     service_group.add_argument("--start-tap", type=bool, help="Start TAP", default=None)
 
     auth_group = parser.add_argument_group("Authentication", description="Authentication options")
@@ -260,6 +263,7 @@ def parse_args() -> Config:
     auth_group.add_argument("--username", help="Username for SSH connection", default=None)
     auth_group.add_argument("--ssh-key", help="SSH public key for SSH connection", default=None, type=Path)
     auth_group.add_argument("--keys-on-remote", help="If the public key exists on the remote server", default=None, type=bool)
+    auth_group.add_argument("--no-keys-on-remote", help="If the public key exists on the remote server", dest="keys_on_remote", action="store_false")
     auth_group.add_argument("--existing-key", type=bool, help="Use existing SSH key", default=None)
     auth_group.add_argument("--no-existing-key", dest="existing_key", help="Do not use existing SSH key", action="store_false")
 
@@ -271,11 +275,14 @@ def parse_args() -> Config:
 
     misc_group = parser.add_argument_group("Misc", description="Misc options")
     misc_group.add_argument("--auto-update", type=bool, help="Automatically update TAP", default=None)
+    misc_group.add_argument("--no-auto-update", dest="auto_update", help="Do not automatically update TAP", action="store_false")
     misc_group.add_argument("--background", type=bool, help="Set background", default=None)
+    misc_group.add_argument("--no-background", dest="background", help="Do not set background", action="store_false")
     misc_group.add_argument("--git-url", help="URL to git repo to clone", default="https://github.com/trustedsec/tap.git")
     misc_group.add_argument("--log-everything", type=bool, help="TAP has the ability to log every command "
         "used via SSH. This is useful for clients who want log files of the pentest. All logs are saved in /var/log/messages"
         , default=None)
+    misc_group.add_argument("--no-log-everything", dest="log_everything", help="Do not log every command", action="store_false")
 
     args = parser.parse_args()
     return Config(**vars(args))

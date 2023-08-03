@@ -129,6 +129,7 @@ class Config:
     update_programs: bool = None
     auto_update: bool = None
     install_programs: bool = None
+    start_tap: bool = None
     # authentication options
     use_ssh_keys: bool = None
     use_password: bool = None

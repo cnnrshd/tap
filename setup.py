@@ -315,7 +315,7 @@ def install_tap(config: Config):
             custom_shell("ssh-add %s" % (str(config.ssh_key.absolute().resolve())), dry_run=config.dry_run)
         # At this point, a key is guaranteed to exist
         if config.keys_on_remote:
-            child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.host,config.remote_port))
+            child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
             i = child.expect(['The authenticity of host', 'password', 'Connection refused', 'Permission denied, please try again.', 'Last login:'])
             if i < 4:
                 print("[*] Error: Could not connect to remote server. Either the SSH Key is incorrectly configured or no SSH Key has been configured")
@@ -334,7 +334,7 @@ def install_tap(config: Config):
             fileopen = open(f"{str(config.ssh_key)}.pub", "r")
             pub = fileopen.read()
             # spawn pexpect to add key
-            child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.host,config.remote_port))
+            child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
             i = child.expect(['The authenticity of host', 'password', 'Connection refused'])
             if i == 0:
                 child.sendline("yes")
@@ -377,7 +377,7 @@ def install_tap(config: Config):
             child.sendline("echo '# TAP box for hostname: %s' >> ~/.ssh/authorized_keys" % (hostname))
             # actual ssh key
             child.sendline("echo '%s' >> ~/.ssh/authorized_keys" % (pub))
-            print("[*] Key for %s added to the external box: %s" % (hostname, config.host))
+            print("[*] Key for %s added to the external box: %s" % (hostname, config.remote_host))
         # Check if ssh keys already installed
     else: # This is password auth
         # Encrypt the password

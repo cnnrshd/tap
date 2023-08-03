@@ -319,15 +319,8 @@ def install_tap(config: Config):
         # ensure SSH agent is started
         print("[*] Starting SSH agent...")
         custom_shell("eval `ssh-agent -s`", dry_run=config.dry_run)
-        # Check if ssh keys exist - if not, make one
-        if not config.existing_key:
-            # make a key
-            print("[*] Generating a new SSH keypair...")
-            custom_shell(f"ssh-keygen -q -N '' -C 'TAP Keypair' -t rsa -b 4096 -f /root/.ssh/id_rsa", dry_run=config.dry_run)
-            # SSH-add won't work, the agent only works for the current shell
-            # Do need to fix permissions tho
-
-            # custom_shell("ssh-add %s" % (str(config.ssh_key.absolute().resolve())), dry_run=config.dry_run)
+        print("[*] Generating a new SSH keypair...")
+        custom_shell(f"ssh-keygen -q -N '' -C 'TAP Keypair' -t rsa -b 4096 -f /root/.ssh/id_rsa", dry_run=config.dry_run)
         # At this point, a key is guaranteed to exist
         if config.keys_on_remote:
             child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))

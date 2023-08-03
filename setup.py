@@ -323,7 +323,7 @@ def install_tap(config: Config):
         custom_shell(f"ssh-keygen -q -N '' -C 'TAP Keypair' -t rsa -b 4096 -f /root/.ssh/id_rsa", dry_run=config.dry_run)
         # At this point, a key is guaranteed to exist
         if config.keys_on_remote:
-            child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
+            child = pexpect.spawn("ssh StrictHostKeyChecking=accept-new %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
             i = child.expect(['The authenticity of host', 'password', 'Connection refused', 'Permission denied, please try again.', 'Last login:'])
             if i < 4:
                 print("[*] Error: Could not connect to remote server. Either the SSH Key is incorrectly configured or no SSH Key has been configured")
@@ -342,7 +342,7 @@ def install_tap(config: Config):
             fileopen = open("/root/.ssh/id_rsa.pub", "r")
             pub = fileopen.read()
             # spawn pexpect to add key
-            child = pexpect.spawn("ssh %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
+            child = pexpect.spawn("ssh StrictHostKeyChecking=accept-new %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
             i = child.expect(['The authenticity of host', 'password', 'Connection refused'])
             if i == 0:
                 child.sendline("yes")
@@ -406,13 +406,13 @@ def install_tap(config: Config):
             else:
                 print("[*] SSH config already exists for %s" % (config.remote_host))
             # Need to ensure that the fingerprint is added to the local known hosts
-            print("[*] Ensuring remote host is added to known hosts...")
-            with open("/root/.ssh/known_hosts", "r") as f:
-                data = f.read()
-                if not config.remote_host in data:
-                    print("[*] Adding remote host to known hosts...")
-                    custom_shell("ssh-keyscan -p %s %s >> /root/.ssh/known_hosts" % (config.remote_port, config.remote_host), dry_run=config.dry_run)
-            print("[*] Remote host has been added to known_hosts")
+            # print("[*] Ensuring remote host is added to known hosts...")
+            # with open("/root/.ssh/known_hosts", "r") as f:
+            #     data = f.read()
+            #     if not config.remote_host in data:
+            #         print("[*] Adding remote host to known hosts...")
+            #         custom_shell("ssh-keyscan -p %s %s >> /root/.ssh/known_hosts" % (config.remote_port, config.remote_host), dry_run=config.dry_run)
+            # print("[*] Remote host has been added to known_hosts")
         # Check if ssh keys already installed
     else: # This is password auth
         # Encrypt the password

@@ -60,25 +60,25 @@ def kill_tap(dry_run : bool = False):
         except: pass
 
 # # here we encrypt via aes, will return encrypted string based on secret key which is random
-# def encryptAES(data):
-#     # the character used for padding--with a block cipher such as AES, the value
-#     # you encrypt must be a multiple of BLOCK_SIZE in length.  This character is
-#     # used to ensure that your value is always a multiple of BLOCK_SIZE
-#     PADDING = '{'
-#     BLOCK_SIZE = 32
-#     # one-liner to sufficiently pad the text to be encrypted
-#     pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
-#     # random value here to randomize builds
-#     a = 50 * 5
-#     # one-liners to encrypt/encode and decrypt/decode a string
-#     # encrypt with AES, encode with base64
-#     EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
-#     DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
-#     secret = os.urandom(BLOCK_SIZE)
-#     cipher = AES.new(secret)
-#     secret = base64.b64encode(secret)
-#     aes = EncodeAES(cipher, data)
-#     return aes.decode("utf-8") + "::::" + secret.decode("utf-8")
+def encryptAES(data):
+    # the character used for padding--with a block cipher such as AES, the value
+    # you encrypt must be a multiple of BLOCK_SIZE in length.  This character is
+    # used to ensure that your value is always a multiple of BLOCK_SIZE
+    PADDING = '{'
+    BLOCK_SIZE = 32
+    # one-liner to sufficiently pad the text to be encrypted
+    pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
+    # random value here to randomize builds
+    a = 50 * 5
+    # one-liners to encrypt/encode and decrypt/decode a string
+    # encrypt with AES, encode with base64
+    EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
+    DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
+    secret = os.urandom(BLOCK_SIZE)
+    cipher = AES.new(secret)
+    secret = base64.b64encode(secret)
+    aes = EncodeAES(cipher, data)
+    return aes.decode("utf-8") + "::::" + secret.decode("utf-8")
 
 # print (r"""
                                                                       
@@ -185,7 +185,7 @@ class Config:
         if self.use_ssh_keys:
             # Determine if they want to create new keys or use old keys
             prompt_user(self, "existing_key", "Do you want to use existing SSH keys: [y/n]: ", {"y": True, "n": False})
-            if self.existing_key:
+            if self.existing_key and not self.ssh_key:
                 while True:
                     ssh_key = input("Enter path to SSH public key: ")
                     if os.path.isfile(ssh_key):
@@ -194,7 +194,7 @@ class Config:
                     else:
                         print("Invalid path. Please try again.")
             else: # Writing a new key
-                while True:
+                while True and not self.ssh_key:
                     new_key_path = input("Enter path for new SSH keypair (don't include .pub): ") # Should be full path to file
                     # check if path is valid
                     if os.path.isfile(new_key_path):
@@ -393,7 +393,7 @@ def install_tap(config: Config):
     # Write out the config
     filewrite = open("/usr/share/tap/config", "w")
     filewrite.write("# tap config options\n\n")
-    filewrite.write("# The username for the ssh connection\nUSERNAME=%s\n# The password for the reverse ssh connection\nPASSWORD=%s\n# The reverse ssh ipaddr or hostname\nIPADDR=%s\n# The port for the reverse connect\nPORT=%s\n" % (config.username, password,config.host,config.local_port))
+    filewrite.write("# The username for the ssh connection\nUSERNAME=%s\n# The password for the reverse ssh connection\nPASSWORD=%s\n# The reverse ssh ipaddr or hostname\nIPADDR=%s\n# The port for the reverse connect\nPORT=%s\n" % (config.username, password,config.remote_host,config.local_port))
     filewrite.write("# SSH check is in seconds\nSSH_CHECK_INTERVAL=60\n")
     filewrite.write("# The local SSH port on the reverse SSH host\nLOCAL_PORT=%s\n" % (config.local_port))
     filewrite.write("# Where to pull updates from\nUPDATE_SERVER=%s\n" % ("EMPTY - UPDATES"))

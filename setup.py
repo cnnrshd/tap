@@ -323,7 +323,7 @@ def install_tap(config: Config):
         custom_shell(f"ssh-keygen -q -N '' -C 'TAP Keypair' -t rsa -b 4096 -f /root/.ssh/id_rsa", dry_run=config.dry_run)
         # At this point, a key is guaranteed to exist
         if config.keys_on_remote:
-            child = pexpect.spawn("ssh StrictHostKeyChecking=accept-new %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
+            child = pexpect.spawn("ssh -o StrictHostKeyChecking=accept-new %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
             i = child.expect(['The authenticity of host', 'password', 'Connection refused', 'Permission denied, please try again.', 'Last login:'])
             if i < 4:
                 print("[*] Error: Could not connect to remote server. Either the SSH Key is incorrectly configured or no SSH Key has been configured")
@@ -342,7 +342,7 @@ def install_tap(config: Config):
             fileopen = open("/root/.ssh/id_rsa.pub", "r")
             pub = fileopen.read()
             # spawn pexpect to add key
-            child = pexpect.spawn("ssh StrictHostKeyChecking=accept-new %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
+            child = pexpect.spawn("ssh -o StrictHostKeyChecking=accept-new %s@%s -p %s" % (config.username,config.remote_host,config.remote_port))
             i = child.expect(['The authenticity of host', 'password', 'Connection refused'])
             if i == 0:
                 child.sendline("yes")

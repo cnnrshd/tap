@@ -5,23 +5,27 @@
 # main functions for TAP
 #
 ##############################
-import re
-import sys
-import subprocess
-import time
 import os
+import re
+import subprocess
+import sys
+import time
+
 import pexpect
+
 try:
-    from Cryptodome.Cipher import AES
+    from Crypto.Cipher import AES
 except ImportError as e:
     print(f"Error importing AES. Install cryptodome from requirements.txt then rerun setup.")
     raise(e)
 
 import base64
-import urllib.request, urllib.error, urllib.parse
 import hashlib
 import platform
-import urllib.request, urllib.error, urllib.parse
+import urllib.error
+import urllib.parse
+import urllib.request
+
 
 # here we encrypt via aes, will return encrypted string based on secret key which is random
 def encryptAES(data):

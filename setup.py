@@ -308,6 +308,9 @@ def install_tap(config: Config):
     # logging everything is handled in the top level - don't need to here
     # Connect to the remote SSH server and setup the reverse SSH connection
     if config.use_ssh_keys:
+        # ensure SSH agent is started
+        print("[*] Starting SSH agent...")
+        custom_shell("eval `ssh-agent -s`", dry_run=config.dry_run)
         # Check if ssh keys exist - if not, make one
         if not config.existing_key:
             # make a key
